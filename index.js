@@ -5,8 +5,9 @@ const Product = require('./models/product.model')
 
 const app = express()
 
-// middleware for json payload
-app.use(express.json())
+// middleware
+app.use(express.json()) // json payload
+app.use(express.urlencoded({extended: false})) // form-data payload
 
 
 // mongoDB
@@ -36,6 +37,7 @@ app.post('/api/addProduct', async (req,res) => {
     }
 })
 
+// find all
 app.get('/api/getProducts', async (req,res) => {
     try {
         // .find to find all data
@@ -46,3 +48,43 @@ app.get('/api/getProducts', async (req,res) => {
     }
 })
 
+// find by ID
+app.get('/api/products/:id', async (req,res) => {
+    try {
+        // .find to find all data
+        const productById = await Product.findById(req.params.id)
+        res.status(200).json(productById)
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+})
+
+// update
+app.put('/api/products/:id', async (req, res) => {
+    try {
+        const productUpdateById = await Product.findByIdAndUpdate(req.params.id, req.body)
+
+        if (!productUpdateById) {
+            res.status(404).json({message: "Product not found."})
+        }
+
+        const updatedProduct = await Product.findById(req.params.id)
+        res.status(200).json(updatedProduct)
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+})
+
+// delete
+app.delete('/api/products/:id', async (req, res) => {
+    try {
+        const deleteByID = await Product.findByIdAndDelete(req.params.id)
+        if (!deleteByID){
+            res.status(404).json({message: "Product not found."})
+        }
+
+        res.status(200).json({message: `Product with ID:${req.params.id} deleted`})
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+})
