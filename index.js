@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 
 // Import Route Modules
 const productRoutes = require('./routes/product.route')
+const userRoutes = require('./routes/user.route')
 
 const app = express()
 
@@ -30,6 +31,7 @@ app.get('/', (req,res) => {
 
 // Use Route Modules
 app.use(`/api/products`,productRoutes)
+app.use(`/api/user`,userRoutes)
 
 
 
