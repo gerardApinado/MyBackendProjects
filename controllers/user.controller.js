@@ -1,6 +1,7 @@
 const CryptoJS = require('crypto-js')
 
 const User = require('../models/user.model')
+const Auth = require('../middlewares/auth')
 
 module.exports.registerUser = async (req, res) => {
     try {
@@ -28,7 +29,7 @@ module.exports.registerUser = async (req, res) => {
 
 module.exports.verifyLogin = async (req,res) => {
     try {
-        const {username, password} = req.body
+        const {username, password, isAdmin} = req.body
 
         const user = await User.findOne({username: username})
 
@@ -41,11 +42,26 @@ module.exports.verifyLogin = async (req,res) => {
         const decryptedPass = bytes.toString(CryptoJS.enc.Utf8)
 
         if (password === decryptedPass) {
-            res.status(200).send({result:user, message:"password match"})
+            // login success
+            // create jwt token
+            const token = Auth.createToken(user)
+            res.status(200).send({result:user, message:"password match", token: token})
         } else {
             res.status(200).send({result:user, message:"password incorrect"})
+            // login fail
         }
         
+    } catch (error) {
+        res.status(500).json({message:error.message})
+    }
+}
+
+module.exports.verifyToken = (req,res) => {
+    try {
+        // decode user token payload
+        const userData = Auth.decodePayload(req.headers.authorization)
+        
+        res.status(200).json({message: "verified", payload: userData})
     } catch (error) {
         res.status(500).json({message:error.message})
     }
