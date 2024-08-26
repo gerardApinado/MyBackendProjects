@@ -1,2 +1,5 @@
 # MyBackendProjects
-# test commit
+
+- API Development (local server)
+- Tech used: NodeJS, ExpressJS
+- Database: MongoDB 
